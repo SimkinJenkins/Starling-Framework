@@ -11,6 +11,10 @@
 
 package starling.animation
 {
+    import com.structures.Bounds;
+    
+    import flash.geom.Rectangle;
+    
     import starling.core.starling_internal;
     import starling.events.Event;
     import starling.events.EventDispatcher;
@@ -134,7 +138,18 @@ package starling.animation
             animate("x", x);
             animate("y", y);
         }
-        
+
+		public function setTo($bounds:Rectangle):void
+		{
+			moveTo($bounds.x, $bounds.y);
+			sizeTo($bounds.width, $bounds.height);
+		}
+
+		public function sizeTo($w:Number, $h:Number):void {
+			animate("width", $w);
+			animate("height", $h);
+		}
+
         /** Animates the 'alpha' property of an object to a certain target value. */ 
         public function fadeTo(alpha:Number):void
         {
@@ -144,8 +159,8 @@ package starling.animation
         /** @inheritDoc */
         public function advanceTime(time:Number):void
         {
-            if (time == 0 || (mRepeatCount == 1 && mCurrentTime == mTotalTime)) return;
-            
+			if(evalAdvanceTimeReturn(time, mRepeatCount, mCurrentTime, mTotalTime))		return;
+
             var i:int;
             var previousTime:Number = mCurrentTime;
             var restTime:Number = mTotalTime - mCurrentTime;
@@ -322,7 +337,14 @@ package starling.animation
          *  this tween is completed. */
         public function get nextTween():Tween { return mNextTween; }
         public function set nextTween(value:Tween):void { mNextTween = value; }
-        
+
+		protected function evalAdvanceTimeReturn($time:Number, $mRepeatCount:int, $mCurrentTime:Number, $mTotalTime:Number):Boolean {
+			if ($time == 0 || ($mRepeatCount == 1 && $mCurrentTime == $mTotalTime)) {
+				return true;
+			}
+			return false;
+		}
+
         // tween pooling
         
         private static var sTweenPool:Vector.<Tween> = new <Tween>[];

@@ -164,7 +164,6 @@ package starling.filters
             mPassTextures = null;
             
             createPrograms();
-            if (mCache) cache();
         }
         
         /** Applies the filter on a certain display object, rendering the output into the current 

@@ -71,8 +71,6 @@ package starling.text
         private var mSize:Number;
         private var mLineHeight:Number;
         private var mBaseline:Number;
-        private var mOffsetX:Number;
-        private var mOffsetY:Number;
         private var mHelperImage:Image;
         private var mCharLocationPool:Vector.<CharLocation>;
         
@@ -89,7 +87,6 @@ package starling.text
             
             mName = "unknown";
             mLineHeight = mSize = mBaseline = 14;
-            mOffsetX = mOffsetY = 0.0;
             mTexture = texture;
             mChars = new Dictionary();
             mHelperImage = new Image(texture);
@@ -109,8 +106,6 @@ package starling.text
         {
             var scale:Number = mTexture.scale;
             var frame:Rectangle = mTexture.frame;
-            var frameX:Number = frame ? frame.x : 0;
-            var frameY:Number = frame ? frame.y : 0;
             
             mName = fontXml.info.attribute("face");
             mSize = parseFloat(fontXml.info.attribute("size")) / scale;
@@ -134,8 +129,8 @@ package starling.text
                 var xAdvance:Number = parseFloat(charElement.attribute("xadvance")) / scale;
                 
                 var region:Rectangle = new Rectangle();
-                region.x = parseFloat(charElement.attribute("x")) / scale + frameX;
-                region.y = parseFloat(charElement.attribute("y")) / scale + frameY;
+                region.x = parseFloat(charElement.attribute("x")) / scale + frame.x;
+                region.y = parseFloat(charElement.attribute("y")) / scale + frame.y;
                 region.width  = parseFloat(charElement.attribute("width")) / scale;
                 region.height = parseFloat(charElement.attribute("height")) / scale;
                 
@@ -227,7 +222,7 @@ package starling.text
             if (text == null || text.length == 0) return new <CharLocation>[];
             if (fontSize < 0) fontSize *= -mSize;
             
-            var lines:Array = [];
+            var lines:Vector.<Vector.<CharLocation>>;
             var finished:Boolean = false;
             var charLocation:CharLocation;
             var numChars:int;
@@ -237,10 +232,11 @@ package starling.text
             
             while (!finished)
             {
-                lines.length = 0;
                 scale = fontSize / mSize;
                 containerWidth  = width / scale;
                 containerHeight = height / scale;
+                
+                lines = new Vector.<Vector.<CharLocation>>();
                 
                 if (mLineHeight <= containerHeight)
                 {
@@ -286,10 +282,6 @@ package starling.text
                             
                             if (charLocation.x + char.width > containerWidth)
                             {
-                                // when autoscaling, we must not split a word in half -> restart
-                                if (autoScale && lastWhiteSpace == -1)
-                                    break;
-
                                 // remove characters and add them again to next line
                                 var numCharsToRemove:int = lastWhiteSpace == -1 ? 1 : i - lastWhiteSpace;
                                 var removeIndex:int = currentLine.length - numCharsToRemove;
@@ -333,9 +325,14 @@ package starling.text
                 } // if (mLineHeight <= containerHeight)
                 
                 if (autoScale && !finished && fontSize > 3)
+                {
                     fontSize -= 1;
+                    lines.length = 0;
+                }
                 else
+                {
                     finished = true; 
+                }
             } // while (!finished)
             
             var finalLocations:Vector.<CharLocation> = new <CharLocation>[];
@@ -364,8 +361,8 @@ package starling.text
                 for (var c:int=0; c<numChars; ++c)
                 {
                     charLocation = line[c];
-                    charLocation.x = scale * (charLocation.x + xOffset + mOffsetX);
-                    charLocation.y = scale * (charLocation.y + yOffset + mOffsetY);
+                    charLocation.x = scale * (charLocation.x + xOffset);
+                    charLocation.y = scale * (charLocation.y + yOffset);
                     charLocation.scale = scale;
                     
                     if (charLocation.char.width > 0 && charLocation.char.height > 0)
@@ -385,7 +382,7 @@ package starling.text
         /** The native size of the font. */
         public function get size():Number { return mSize; }
         
-        /** The height of one line in points. */
+        /** The height of one line in pixels. */
         public function get lineHeight():Number { return mLineHeight; }
         public function set lineHeight(value:Number):void { mLineHeight = value; }
         
@@ -393,20 +390,8 @@ package starling.text
         public function get smoothing():String { return mHelperImage.smoothing; }
         public function set smoothing(value:String):void { mHelperImage.smoothing = value; } 
         
-        /** The baseline of the font. This property does not affect text rendering;
-         *  it's just an information that may be useful for exact text placement. */
+        /** The baseline of the font. */
         public function get baseline():Number { return mBaseline; }
-        public function set baseline(value:Number):void { mBaseline = value; }
-        
-        /** An offset that moves any generated text along the x-axis (in points).
-         *  Useful to make up for incorrect font data. @default 0. */ 
-        public function get offsetX():Number { return mOffsetX; }
-        public function set offsetX(value:Number):void { mOffsetX = value; }
-        
-        /** An offset that moves any generated text along the y-axis (in points).
-         *  Useful to make up for incorrect font data. @default 0. */
-        public function get offsetY():Number { return mOffsetY; }
-        public function set offsetY(value:Number):void { mOffsetY = value; }
     }
 }
 

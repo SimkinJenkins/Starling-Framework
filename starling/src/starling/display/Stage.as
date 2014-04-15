@@ -95,34 +95,21 @@ package starling.display
             return target;
         }
         
-        /** Draws the complete stage into a BitmapData object.
-         *
-         *  <p>If you encounter problems with transparency, start Starling in BASELINE profile
-         *  (or higher). BASELINE_CONSTRAINED might not support transparency on all platforms.
-         *  </p>
-         *
-         *  @param destination: If you pass null, the object will be created for you.
-         *                      If you pass a BitmapData object, it should have the size of the
-         *                      back buffer (which is accessible via the respective properties
-         *                      on the Starling instance).
-         *  @param transparent: If enabled, empty areas will appear transparent; otherwise, they
-         *                      will be filled with the stage color.
-         */
-        public function drawToBitmapData(destination:BitmapData=null,
-                                         transparent:Boolean=true):BitmapData
+        /** Draws the complete stage into a BitmapData object. If you don't pass a parameter, the
+         *  object will be created for you. If you pass a BitmapData object to the method, it
+         *  should have the size of the back buffer (which is accessible via the respective
+         *  properties on the Starling instance). */
+        public function drawToBitmapData(destination:BitmapData=null):BitmapData
         {
             var support:RenderSupport = new RenderSupport();
             var star:Starling = Starling.current;
             
             if (destination == null)
-                destination = new BitmapData(star.backBufferWidth, star.backBufferHeight, transparent);
+                destination = new BitmapData(star.backBufferWidth, star.backBufferHeight);
             
             support.renderTarget = null;
             support.setOrthographicProjection(0, 0, mWidth, mHeight);
-            
-            if (transparent) support.clear();
-            else             support.clear(mColor, 1);
-            
+            support.clear(mColor, 1);
             render(support, 1.0);
             support.finishQuadBatch();
             
