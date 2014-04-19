@@ -362,6 +362,7 @@ package starling.utils
         /** Empties the queue and aborts any pending load operations. */
         public function purgeQueue():void
         {
+			log("purgeQueue");
             mIsLoading = false;
             mQueue.length = 0;
             clearTimeout(mTimeoutID);
@@ -503,8 +504,12 @@ package starling.utils
             if (Starling.context == null)
                 throw new Error("The Starling instance needs to be ready before textures can be loaded.");
             
-            if (mIsLoading)
-                throw new Error("The queue is already being processed");
+            if (mIsLoading) {
+				trace("AssetsManager :", "The queue is already being processed");
+				purgeQueue();
+				return;
+				throw new Error("The queue is already being processed");
+			}
             
             var xmls:Vector.<XML> = new <XML>[];
             var numElements:int = mQueue.length;
@@ -600,6 +605,7 @@ package starling.utils
             
             function process(asset:Object):void
             {
+//				trace("AssetManager :: ", "process");
                 var texture:Texture;
                 var bytes:ByteArray;
                 
