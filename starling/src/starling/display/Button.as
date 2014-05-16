@@ -49,7 +49,7 @@ package starling.display {
 		private var mDownState:Texture;
 		
 		private var mContents:Sprite;
-		private var mBackground:Image;
+		public var mBackground:Image;
 		private var mTextField:TextField;
 		private var mTextBounds:Rectangle;
 		

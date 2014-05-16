@@ -184,8 +184,12 @@ package starling.text
             
             mHitArea.width  = bitmapData.width  / scale;
             mHitArea.height = bitmapData.height / scale;
-            
-            var texture:Texture = Texture.fromBitmapData(bitmapData, false, false, scale, format);
+//			trace(mHitArea.width, mHitArea.height);
+            try {
+	            var texture:Texture = Texture.fromBitmapData(bitmapData, false, false, scale, format);
+			} catch($error:Error) {
+				trace("Textfield :", $error);
+			}
             texture.root.onRestore = function():void
             {
                 texture.root.uploadBitmapData(renderText(scale, mTextBounds));

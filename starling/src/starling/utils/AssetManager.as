@@ -597,7 +597,7 @@ package starling.utils
                 onProgress(currentRatio + (1.0 / numElements) * Math.min(1.0, ratio) * 0.99);
             }
         }
-        
+
         private function processRawAsset(name:String, rawAsset:Object, xmls:Vector.<XML>, onProgress:Function,
 										 onComplete:Function, $data:Object = null, $onError:Function = null):void
         {
@@ -736,13 +736,17 @@ package starling.utils
 				if($data) {
 					var variables:URLVariables = new URLVariables();
 					var data:Object = new Object();
+					var count:uint = 0;
 					for(var name:String in $data) {
 						if(name != "method" && name != "headers" && name != "targetExtension") {
 							variables[name] = $data[name];
 							data[name] = $data[name];
+							count++;
 						}
 					}
-					request.data = variables;
+					if(count != 0) {
+						request.data = variables;
+					}
 					request.method = $data.method ? $data.method : URLRequestMethod.GET;
 					if($data.headers) {
 						request.requestHeaders = $data.headers;
