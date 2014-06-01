@@ -737,10 +737,10 @@ package starling.utils
 					var variables:URLVariables = new URLVariables();
 					var data:Object = new Object();
 					var count:uint = 0;
-					for(var name:String in $data) {
-						if(name != "method" && name != "headers" && name != "targetExtension") {
-							variables[name] = $data[name];
-							data[name] = $data[name];
+					for(var attName:String in $data) {
+						if(attName != "method" && attName != "headers" && attName != "targetExtension") {
+							variables[attName] = $data[attName];
+							data[attName] = $data[attName];
 							count++;
 						}
 					}

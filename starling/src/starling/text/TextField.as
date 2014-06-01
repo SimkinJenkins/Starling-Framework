@@ -224,7 +224,7 @@ package starling.text
             var height:Number = mHitArea.height * scale;
             var hAlign:String = mHAlign;
             var vAlign:String = mVAlign;
-            
+
             if (isHorizontalAutoSize)
             {
                 width = int.MAX_VALUE;
