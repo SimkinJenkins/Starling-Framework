@@ -354,7 +354,7 @@ package starling.textures
                 
                 // Rectangle Textures are supported beginning with AIR 3.8. By calling the new
                 // methods only through those lookups, we stay compatible with older SDKs.
-                nativeTexture = context["createRectangleTexture"](
+                nativeTexture = context["createRectangleTexture"] (
                     actualWidth, actualHeight, format, optimizeForRenderToTexture);
             }
             else
