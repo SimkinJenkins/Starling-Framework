@@ -846,6 +846,8 @@ package starling.utils
 				_urlLoader.removeEventListener(ProgressEvent.PROGRESS, _onLoadProgress);
 				_urlLoader.removeEventListener(Event.COMPLETE, _onUrlLoaderComplete);
 				_onIoError = null;
+				_onLoadProgress = null;
+				_onUrlLoaderComplete = null;
 				_urlLoader = null;
 			}
 			cleanLoader();
