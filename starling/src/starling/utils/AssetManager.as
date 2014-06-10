@@ -83,7 +83,15 @@ package starling.utils
         private var mXmls:Dictionary;
         private var mObjects:Dictionary;
         private var mByteArrays:Dictionary;
-        
+
+		private var _urlLoader:URLLoader
+		private var _onIoError:Function;
+		private var _onLoadProgress:Function;
+		private var _onUrlLoaderComplete:Function;
+
+		private var _loader:Loader;
+		private var _onLoaderComplete:Function;
+
         /** helper objects */
         private static var sNames:Vector.<String> = new <String>[];
 
@@ -365,6 +373,7 @@ package starling.utils
 			log("purgeQueue");
             mIsLoading = false;
             mQueue.length = 0;
+			cleanURLLoader();
             clearTimeout(mTimeoutID);
         }
         
@@ -716,7 +725,7 @@ package starling.utils
 									  onComplete:Function, $data:Object = null, $onError:Function = null):void
         {
             var extension:String = null;
-            var urlLoader:URLLoader = null;
+			cleanURLLoader();
             
             if (rawAsset is Class)
             {
@@ -727,11 +736,14 @@ package starling.utils
                 var url:String = rawAsset as String;
                 extension = url.split(".").pop().toLowerCase().split("?")[0];
                 
-                urlLoader = new URLLoader();
-                urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
-                urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIoError);
-                urlLoader.addEventListener(ProgressEvent.PROGRESS, onLoadProgress);
-                urlLoader.addEventListener(Event.COMPLETE, onUrlLoaderComplete);
+				_urlLoader = new URLLoader();
+				_urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
+				_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIoError);
+				_onIoError = onIoError;
+				_urlLoader.addEventListener(ProgressEvent.PROGRESS, onLoadProgress);
+				_onLoadProgress = onLoadProgress;
+				_urlLoader.addEventListener(Event.COMPLETE, onUrlLoaderComplete);
+				_onUrlLoaderComplete = onUrlLoaderComplete;
 				var request:URLRequest = new URLRequest(url);
 				if($data) {
 					var variables:URLVariables = new URLVariables();
@@ -757,7 +769,7 @@ package starling.utils
 						extension = $data.targetExtension;
 					}
 				}
-                urlLoader.load(request);
+                _urlLoader.load(request);
             }
             
             function onIoError(event:IOErrorEvent):void
@@ -777,12 +789,12 @@ package starling.utils
             
             function onUrlLoaderComplete(event:Object):void
             {
-                var bytes:ByteArray = urlLoader.data as ByteArray;
+                var bytes:ByteArray = _urlLoader.data as ByteArray;
                 var sound:Sound;
                 
-                urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIoError);
-                urlLoader.removeEventListener(ProgressEvent.PROGRESS, onLoadProgress);
-                urlLoader.removeEventListener(Event.COMPLETE, onUrlLoaderComplete);
+				_urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIoError);
+				_urlLoader.removeEventListener(ProgressEvent.PROGRESS, onLoadProgress);
+				_urlLoader.removeEventListener(Event.COMPLETE, onUrlLoaderComplete);
                 
                 switch (extension)
                 {
@@ -799,10 +811,12 @@ package starling.utils
                     case "gif":
 					case "html":
                         var loaderContext:LoaderContext = new LoaderContext(mCheckPolicyFile);
-                        var loader:Loader = new Loader();
+						cleanLoader();
+						_loader = new Loader();
                         loaderContext.imageDecodingPolicy = ImageDecodingPolicy.ON_LOAD;
-                        loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
-                        loader.loadBytes(bytes, loaderContext);
+						_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderComplete);
+						_onLoaderComplete = onLoaderComplete;
+						_loader.loadBytes(bytes, loaderContext);
                         break;
                     default: // any XML / JSON / binary data 
                         onComplete(bytes);
@@ -812,11 +826,30 @@ package starling.utils
 
             function onLoaderComplete(event:Object):void
             {
-                urlLoader.data.clear();
+				_urlLoader.data.clear();
                 event.target.removeEventListener(Event.COMPLETE, onLoaderComplete);
                 onComplete(event.target.content);
             }
         }
+
+		private function cleanLoader():void {
+			if(_loader) {
+				_loader.removeEventListener(Event.COMPLETE, _onLoaderComplete);
+				_onLoaderComplete = null;
+				_loader = null;
+			}
+		}
+
+		private function cleanURLLoader():void {
+			if(_urlLoader) {
+				_urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, _onIoError);
+				_urlLoader.removeEventListener(ProgressEvent.PROGRESS, _onLoadProgress);
+				_urlLoader.removeEventListener(Event.COMPLETE, _onUrlLoaderComplete);
+				_onIoError = null;
+				_urlLoader = null;
+			}
+			cleanLoader();
+		}
 
         // helpers
         
