@@ -165,11 +165,13 @@ package starling.animation
             var previousTime:Number = mCurrentTime;
             var restTime:Number = mTotalTime - mCurrentTime;
             var carryOverTime:Number = time > restTime ? time - restTime : 0.0;
-            
+            trace(mCurrentTime);
             mCurrentTime += time;
             
-            if (mCurrentTime <= 0) 
-                return; // the delay is not over yet
+            if (mCurrentTime <= 0) {
+				dispatchEventWith(Event.OPEN);
+				return; // the delay is not over yet
+			}
             else if (mCurrentTime > mTotalTime) 
                 mCurrentTime = mTotalTime;
             
