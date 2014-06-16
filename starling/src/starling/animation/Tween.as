@@ -11,10 +11,9 @@
 
 package starling.animation
 {
-    import com.structures.Bounds;
-    
+
     import flash.geom.Rectangle;
-    
+
     import starling.core.starling_internal;
     import starling.events.Event;
     import starling.events.EventDispatcher;
@@ -165,7 +164,6 @@ package starling.animation
             var previousTime:Number = mCurrentTime;
             var restTime:Number = mTotalTime - mCurrentTime;
             var carryOverTime:Number = time > restTime ? time - restTime : 0.0;
-            trace(mCurrentTime);
             mCurrentTime += time;
             
             if (mCurrentTime <= 0) {

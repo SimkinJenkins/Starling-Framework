@@ -826,7 +826,9 @@ package starling.utils
 
             function onLoaderComplete(event:Object):void
             {
-				_urlLoader.data.clear();
+				if(_urlLoader) {
+					_urlLoader.data.clear();
+				}
                 event.target.removeEventListener(Event.COMPLETE, onLoaderComplete);
                 onComplete(event.target.content);
             }
@@ -842,6 +844,9 @@ package starling.utils
 
 		private function cleanURLLoader():void {
 			if(_urlLoader) {
+				if(_urlLoader.data) {
+					_urlLoader.data.clear();
+				}
 				_urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, _onIoError);
 				_urlLoader.removeEventListener(ProgressEvent.PROGRESS, _onLoadProgress);
 				_urlLoader.removeEventListener(Event.COMPLETE, _onUrlLoaderComplete);
